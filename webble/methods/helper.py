@@ -1,9 +1,12 @@
 import requests
-import json
-import wikipedia
+import fitz
 
 
+
+# Wiki API for images
 WIKI_IMAGE = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='
+
+# Wiki API for page summary
 WIKI_SUMMARY = 'https://en.wikipedia.org/w/api.php?action=query&' \
                'format=json&prop=extracts&exintro=true&explaintext=true&titles='
 
@@ -32,9 +35,11 @@ def get_summary(query):
     return "Page not found"
 
 
-def convert_pdf_to_image(book_pdf, page):
-    book = fitz.open(stream=book_pdf, filetype="pdf")
-    target_page = book.load_page(page)
-    pix = target_page.get_pixmap(alpha=False)
-    image_data = pix.tobytes()
+def get_pdf_data(pdf_path):
+    return fitz.open(stream=pdf_path.read(), filetype="pdf")
+
+
+def convert_pdf_to_image(pdf_data, page):
+    pix = pdf_data.load_page(page).get_pixmap(alpha=False)
+    image_data = pix.tobytes("jpg")
     return image_data

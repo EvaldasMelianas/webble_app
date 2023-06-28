@@ -4,58 +4,82 @@
 {% endblock %}
 {% block content %}
 
-<style>
-img {
-  border: 4px solid #B8C4CD;
-}
-</style>
-
+<!-- Book detail container -->
 <div class="container mt-4">
   <div class="card mb-3">
-    <div class="row g-0">
+    <div class="row g-1">
       <div class="col-md-4">
         <img class="card-img image-card" src="{{ book.cover_image.url }}" alt="Book Cover">
       </div>
       <div class="col-md-8">
-          <div class="card-header">
-            <h1 class="text-center">'{{ book.title }}'</h1>
-            <h6 class="text-center">By: {{ book.authors.all|join:", " }}</h6>
-            <h6 class="text-center">Published: {{ book.publish_date }}</h6>
-          </div>
+        <div class="card-header">
+          <h1 class="text-center">'{{ book.title }}'</h1>
+          <h6 class="text-center">By: {{ book.authors.all|join:", " }}</h6>
+          <h6 class="text-center">Published: {{ book.publish_date }}</h6>
+        </div>
         <div class="card-body">
           <p class="card-text">{{ book.description }}</p>
         </div>
       </div>
     </div>
-      <div class="card-footer text-center">
-        <a href="#" class="btn btn-primary">Leave a Review</a>
-        <a href="#" class="btn btn-primary">Read</a>
-      </div>
+    <div class="card-footer text-center">
+      <a href="#" class="btn btn-primary">Leave a Review</a>
+      <a href="{% url 'webble:read_book' book_pk=book.pk page_number=1 %}" class="btn btn-primary">Read</a>
+    </div>
   </div>
 </div>
 
-  <div class="container mt-4">
-    <div class="card text-center" style="background-color:#ECF0F1;">
-      <h3> Similar books: </h3>
-    </div>
-    </br>
-    <div class="row justify-content-center">
-      {% for book in similar_books %}
-      <div class="col-lg-3 mb-3">
-        <div class="card text-center">
-          <div class="card-header">
-            <small> {{ book.title|truncatechars:20 }} </small>
-          </div>
-          <div class="card-body" style="background-color:#EAF2F8;">
-            <div class="card">
-              <a href="{% url 'webble:book_detail' book.pk %}">
+<!-- Similar books container -->
+<div class="container mt-4">
+  <div class="card text-center">
+    <h3>Similar books:</h3>
+  </div>
+  <div class="row justify-content-center">
+    {% for book in similar_books %}
+    <div class="col-lg-2 mb-3">
+      <div class="card text-center">
+        <div class="card-header">
+          <small>{{ book.title|truncatechars:20 }}</small>
+        </div>
+        <div class="card-body">
+          <div class="card">
+            <a href="{% url 'webble:book_detail' book.pk %}">
               <img src="{{ book.cover_image.url }}" class="card-img-top" style="object-fit: contain; height: 200px;">
-              </a>
-            </div>
+            </a>
           </div>
         </div>
       </div>
-      {% endfor %}
     </div>
+    {% endfor %}
   </div>
+</div>
+
+<!-- Reviews container -->
+<div class="container mt-4">
+  <div class="card text-center">
+    <h3>Reviews:</h3>
+  </div>
+  <div class="container mt-4">
+    {% if reviews %}
+    {% for review in reviews %}
+    <div class="card">
+      <div class="card-header">
+        <strong>{{ review.user }}</strong>
+        <small>{{ review.date }}</small><br>
+        <small>{{ review.rating }}</small><br>
+      </div>
+      <div class="card-body">
+        <p class="card-text">{{ review.review }}</p>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="card">
+      <div class="card-text">
+        <small>No reviews</small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

@@ -4,11 +4,6 @@
 
 {% block content %}
 
-<style>
-img {
-  border: 2px solid #B8C4CD;
-}
-</style>
 
   <div class="container mt-4">
     <div class="card text-center" style="background-color:#ECF0F1;">
@@ -17,7 +12,7 @@ img {
     </br>
     <div class="row justify-content-center">
       {% for author in authors %}
-      <div class="col-lg-4 mb-3">
+      <div class="col-lg-2 mb-3">
         <div class="card text-center">
           <div class="card-header">
             <small> {{ author.name|truncatechars:20 }} </small>

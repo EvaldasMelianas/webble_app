@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row justify-content-center">
+      <div class="col-lg-8 mb-5">
+        <div class="card text-center">
+          <div class="card-header">
+            <strong>
+              <a href="{% url 'webble:book_detail' book.pk %}">
+              {{ book.title }}
+              </a>
+		      <p>Page: {{ page_number }} / {{ book.page_count }}</p>
+            </strong>
+          </div>
+          <div class="card-body" style="background-color:#EAF2F8;">
+              <img src="data:image/;base64,{{ page }}">
+          </div>
+          <div class="card-footer">
+            <form method="POST" action="{% url 'webble:read_book' book_pk=book.pk page_number=page_number %}">
+              {% csrf_token %}
+              {% if page_number > 1 %}
+              <button type="submit" name="previous">Previous</button>
+              {% endif %}
+              <button type="submit" name="bookmark">Bookmark</button>
+              {% if book.page_count > page_number %}
+              <button type="submit" name="next">Next</button>
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

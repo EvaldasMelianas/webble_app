@@ -2,10 +2,8 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import Avg
-import fitz
-import requests
 
-from .methods.helper import get_image_data, get_summary
+from .methods.helper import get_image_data, get_summary, convert_pdf_to_image, get_pdf_data
 
 
 class Author(models.Model):
@@ -50,13 +48,11 @@ class Book(models.Model):
         if not self.pk:
             self.description = get_summary(self.title)
             # Open the uploaded PDF file and get the page count
-            pdf_data = self.pdf.read()
-            book = fitz.open(stream=pdf_data, filetype="pdf")
-            self.page_count = book.page_count
+            pdf_data = get_pdf_data(self.pdf)
+            self.page_count = pdf_data.page_count
             # Generate the cover image from the first page of the PDF
-            pix = book.load_page(0).get_pixmap(alpha=False)
-            image_data = pix.tobytes()
-            # Save the cover image in the cover_image field
+            image_data = convert_pdf_to_image(pdf_data, 0)
+            # Assign the cover image in the cover_image field
             self.cover_image.save(f'{self.title}.jpg', ContentFile(image_data), save=False)
         super().save(*args, **kwargs)
 
@@ -73,6 +69,10 @@ class Bookmark(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     page = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['date']
+        unique_together = ('book', 'user', 'page',)
 
 
 class Review(models.Model):
