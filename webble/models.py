@@ -64,12 +64,6 @@ class Book(models.Model):
         # Get the average rating of the book, returns None if no reviews
         return self.object.reviews.aggregate(Avg('rating'))['rating__avg']
 
-    def get_many_string(self):
-        # Get all authors and genres assigned to the book and return string representation
-        authors = ', '.join(str(author) for author in self.authors.all())
-        genres = ', '.join(str(genre) for genre in self.genres.all())
-        return {'authors': authors, 'genres': genres}
-
     def __str__(self):
         return f'{self.title}'
 
