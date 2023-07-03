@@ -36,7 +36,6 @@ def get_summary(query):
     return "Page not found"
 
 
-# noinspection PyUnresolvedReferences
 def get_pdf_data(pdf_path):
     return fitz.open(stream=pdf_path.read(), filetype="pdf")
 
@@ -47,5 +46,14 @@ def convert_pdf_to_image(pdf_data, page):
     return image_data
 
 
-def decode_image_data(image_data):
+def decode_image_data(pdf_path, page):
+    image_data = convert_pdf_to_image(pdf_path, page)
     return base64.b64encode(image_data).decode('ascii')
+
+
+def get_books_by_genre(genre_model, book_model):
+    genre_books = {}
+    for genre in genre_model.objects.all():
+        filtered_books = book_model.objects.filter(genres=genre)
+        genre_books[genre.genre] = filtered_books.order_by('?')[:6]
+    return genre_books

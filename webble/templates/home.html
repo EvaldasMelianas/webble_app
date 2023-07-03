@@ -7,6 +7,7 @@
   <div class="container mt-4">
     {% for genre, books in genre_books.items %}
     <div class="card text-center" style="background-color:#ECF0F1;">
+      {% if books %}
       <h3>{{ genre }}</h3>
     </div>
     </br>
@@ -28,6 +29,7 @@
       </div>
       {% endfor %}
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 {% endblock %}

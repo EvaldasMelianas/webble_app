@@ -23,13 +23,20 @@
       </div>
     </div>
     <div class="card-footer text-center">
-      <a href="{% url 'webble:add_review' book.pk %}" class="btn btn-primary">Leave a Review</a>
-      <a href="{% url 'webble:read_book' book.title 1 %}" class="btn btn-primary">Read</a>
+      {% if user.is_authenticated %}
+        {% if user_review %}
+          <a href="{% url 'user:update_review' book.pk user_review.pk %}" class="btn btn-success">Update Review</a>
+        {% else %}
+          <a href="{% url 'user:add_review' book.pk %}" class="btn btn-primary">Leave a Review</a>
+        {% endif %}
+        <a href="{% url 'webble:read_book' book.title 1 %}" class="btn btn-primary">Read</a>
+      {% endif %}
     </div>
   </div>
 </div>
 
 <!-- Similar books container -->
+{% if similar_books %}
 <div class="container mt-4">
   <div class="card text-center" style="background-color:#ECF0F1;">
     <h3>Similar books:</h3>
@@ -53,6 +60,7 @@
     {% endfor %}
   </div>
 </div>
+{% endif %}
 
 <!-- Reviews container -->
 <div class="container mt-4">

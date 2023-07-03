@@ -41,17 +41,17 @@
     <ul class="navbar-nav ml-auto">
       {% if user.is_authenticated %}
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'webble:user_details' username=user %}">{{ user }}</a>
+        <a class="nav-link" href="{% url 'user:user_details' username=user %}">{{ user }}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'webble:logout' %}">Logout</a>
+        <a class="nav-link" href="{% url 'user:logout' %}">Logout</a>
       </li>
       {% else %}
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'webble:login' %}">Login</a>
+        <a class="nav-link" href="{% url 'user:login' %}">Login</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'webble:register' %}">Register</a>
+        <a class="nav-link" href="{% url 'user:register' %}">Register</a>
       </li>
       {% endif %}
     </ul>

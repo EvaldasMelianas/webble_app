@@ -1,14 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, FormView, CreateView
+from django.views.generic import ListView, DetailView
 
-from .forms import RegistrationForm
-from .models import Book, Author, Genre, Bookmark, ReadingProgress, Review
-from .methods.helper import convert_pdf_to_image, get_pdf_data, decode_image_data
+from user.models import Bookmark, Review
+from .models import Book, Author, Genre
+from .methods.helper import get_pdf_data, decode_image_data, get_books_by_genre
+from user.methods.helper import get_review
 
 
 class HomeView(ListView):
@@ -18,11 +17,7 @@ class HomeView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        genre_books = {}
-        for genre in self.model.objects.all():
-            filtered_books = Book.objects.filter(genres=genre)
-            genre_books[genre.genre] = filtered_books.order_by('?')[:6]
-        context['genre_books'] = genre_books
+        context['genre_books'] = get_books_by_genre(self.model, Book)
         return context
 
 
@@ -66,6 +61,8 @@ class BookDetailView(DetailView):
         similar_books = Book.objects.filter(genres__in=self.object.genres.all()).exclude(pk=self.object.pk)
         context['similar_books'] = similar_books.order_by('?')[:5]
         context['reviews'] = reviews
+        if self.request.user.is_authenticated:
+            context['user_review'] = get_review(self.request.user, self.object.pk) or None
         return context
 
 
@@ -100,12 +97,9 @@ class ReadBookView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['bookmark'] = Bookmark.objects.filter(user=self.request.user, book=self.object)
         context['page_number'] = self.kwargs['page_number']-1
         context['next'], context['previous'] = self.kwargs['page_number']+1, self.kwargs['page_number']-1
-        pdf_data = get_pdf_data(self.object.pdf)
-        image_data = convert_pdf_to_image(pdf_data, context['page_number'])
-        context['page_image'] = decode_image_data(image_data)
+        context['page_image'] = decode_image_data(get_pdf_data(self.object.pdf), context['page_number'])
         return context
 
     def post(self, request, title: str, page_number: int):
@@ -119,56 +113,3 @@ class ReadBookView(LoginRequiredMixin, DetailView):
                 bookmark.save()
                 messages.success(self.request, 'Bookmark submission successful')
             return redirect('webble:read_book', title=book.title, page_number=page_number)
-
-
-class RegisterView(FormView):
-    form_class = RegistrationForm
-    template_name = 'register.html'
-    success_url = '/'
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        for name, error_list in form.errors.get_json_data().items():
-            for error in error_list:
-                error_message = error['message']
-                messages.error(self.request, error_message)
-        return super().form_invalid(form)
-
-
-class UserDetails(DetailView):
-    model = User
-    template_name = 'user_page.html'
-    context_object_name = 'user'
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_progress'] = ReadingProgress.objects.filter(user=self.object)
-        user_bookmarks = {}
-        for bookmark in Bookmark.objects.filter(user=self.object):
-            title = bookmark.book.title
-            page_number = bookmark.page
-            if title not in user_bookmarks:
-                user_bookmarks[title] = []
-            user_bookmarks[title].append(page_number)
-        context['user_bookmarks'] = user_bookmarks
-        return context
-
-
-class CreateReview(LoginRequiredMixin, CreateView):
-    model = Review
-    fields = ['rating', 'review']
-    template_name = 'add_review.html'
-
-    def get_success_url(self):
-        book_pk = self.kwargs['pk']
-        return reverse_lazy('webble:book_detail', kwargs={'pk': book_pk})
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.instance.book = Book.objects.get(pk=self.kwargs['pk'])
-        return super().form_valid(form)
