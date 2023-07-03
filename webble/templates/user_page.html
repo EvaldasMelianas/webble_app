@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Bookmarks</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" id="filterForm">
+              {% csrf_token %}
+              <label>Filter by Book Title:</label>
+              <select name="name_of_book" id="bookTitleSelect">
+                <option value="">All</option>
+                {% for title in user_bookmarks %}
+                  <option value="{{ title }}">{{ title }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary" name="filter_bookmark">Filter</button>
+            </form>
+            {% for title, pages in user_bookmarks.items %}
+              <div class="bookmark" data-book="{{ title }}">
+                <h5> {{ title }} </h5>
+                <h5>Pages:</h5>
+                {% for page in pages %}
+                <a href="{% url 'webble:read_book' title page %}"><strong>{{ page }}</strong></a>
+                {% endfor %}
+                <!-- Additional details about the bookmark -->
+              </div>
+              <hr>
+            {% empty %}
+              <p>No bookmarks found.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Progress</h3>
+          </div>
+          <div class="card-body">
+            {% for item in user_progress %}
+              <div>
+                <h5>{{ item.book.title }}</h5>
+                <p>Current Page: {{ item.last_page_read }}
+                  <button>
+                  <a href="{% url 'webble:read_book' item.book.title item.last_page_read %}"
+                     class="btn btn-primary">Continue</a>
+                </button>
+                </p>
+                <!-- Additional details about the progress -->
+              </div>
+              <hr>
+            {% empty %}
+              <p>No progress found.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const filterForm = document.getElementById('filterForm');
+    const bookTitleSelect = document.getElementById('bookTitleSelect');
+    const bookmarks = document.querySelectorAll('.bookmark');
+    filterForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const selectedBook = bookTitleSelect.value;
+      filterBookmarks(selectedBook);
+    });
+    function filterBookmarks(selectedBook) {
+      bookmarks.forEach(bookmark => {
+        const bookTitle = bookmark.getAttribute('data-book');
+        if (selectedBook === '' || bookTitle === selectedBook) {
+          bookmark.style.display = 'block';
+        } else {
+          bookmark.style.display = 'none';
+        }
+      });
+    }
+  </script>
+{% endblock %}

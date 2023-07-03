@@ -26,7 +26,7 @@
         <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Genres</button>
         <ul class="dropdown-menu dropdown-menu-dark">
           {% for genre in genres %}
-          <a class="dropdown-item" href="{% url 'webble:genre_detail' pk=genre.pk %}">{{ genre.genre }}</a>
+          <a class="dropdown-item" href="{% url 'webble:genre_detail' genre.pk %}">{{ genre.genre }}</a>
           {% endfor %}
         </ul>
       </li>
@@ -41,7 +41,7 @@
     <ul class="navbar-nav ml-auto">
       {% if user.is_authenticated %}
       <li class="nav-item">
-        <a class="nav-link">{{ user.username }}</a>
+        <a class="nav-link" href="{% url 'webble:user_details' username=user %}">{{ user }}</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'webble:logout' %}">Logout</a>

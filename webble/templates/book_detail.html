@@ -23,20 +23,20 @@
       </div>
     </div>
     <div class="card-footer text-center">
-      <a href="#" class="btn btn-primary">Leave a Review</a>
-      <a href="{% url 'webble:read_book' book_pk=book.pk page_number=1 %}" class="btn btn-primary">Read</a>
+      <a href="{% url 'webble:add_review' book.pk %}" class="btn btn-primary">Leave a Review</a>
+      <a href="{% url 'webble:read_book' book.title 1 %}" class="btn btn-primary">Read</a>
     </div>
   </div>
 </div>
 
 <!-- Similar books container -->
 <div class="container mt-4">
-  <div class="card text-center">
+  <div class="card text-center" style="background-color:#ECF0F1;">
     <h3>Similar books:</h3>
   </div>
-  <div class="row justify-content-center">
+  <div class="row justify-content-center mt-4">
     {% for book in similar_books %}
-    <div class="col-lg-2 mb-3">
+    <div class="col-lg-2">
       <div class="card text-center">
         <div class="card-header">
           <small>{{ book.title|truncatechars:20 }}</small>
@@ -56,7 +56,7 @@
 
 <!-- Reviews container -->
 <div class="container mt-4">
-  <div class="card text-center">
+  <div class="card text-center" style="background-color:#ECF0F1;">
     <h3>Reviews:</h3>
   </div>
   <div class="container mt-4">
