@@ -32,7 +32,7 @@ class Review(models.Model):
 class ReadingProgress(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_started = models.DateField(default=Now)
+    date_started = models.DateField(null=True, default=Now)
     date_finished = models.DateField(null=True, blank=True)
     last_page_read = models.IntegerField(null=True, blank=True)
 

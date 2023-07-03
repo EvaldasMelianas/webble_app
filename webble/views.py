@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView
 from user.models import Bookmark, Review
 from .models import Book, Author, Genre
 from .methods.helper import get_pdf_data, decode_image_data, get_books_by_genre
-from user.methods.helper import get_review
+from user.methods.helper import get_review, update_reading_progress
 
 
 class HomeView(ListView):
@@ -100,6 +100,7 @@ class ReadBookView(LoginRequiredMixin, DetailView):
         context['page_number'] = self.kwargs['page_number']-1
         context['next'], context['previous'] = self.kwargs['page_number']+1, self.kwargs['page_number']-1
         context['page_image'] = decode_image_data(get_pdf_data(self.object.pdf), context['page_number'])
+        update_reading_progress(self.request.user.id, self.object, context['page_number'])
         return context
 
     def post(self, request, title: str, page_number: int):
