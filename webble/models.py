@@ -1,9 +1,6 @@
-from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Avg
-from django.db.models.functions import Now
 
 from .methods.helper import get_image_data, get_summary, convert_pdf_to_image, get_pdf_data
 
@@ -40,7 +37,7 @@ class Book(models.Model):
     authors = models.ManyToManyField(Author)
     genres = models.ManyToManyField(Genre)
     pdf = models.FileField(upload_to='books/')
-    cover_image = models.ImageField(upload_to='covers/')
+    cover_image = models.ImageField(upload_to='covers/', blank=True)
     publish_date = models.DateField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     page_count = models.IntegerField(null=True, blank=True)
@@ -64,42 +61,3 @@ class Book(models.Model):
 
     def __str__(self):
         return f'{self.title}'
-
-
-class Bookmark(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-    page = models.IntegerField(null=True, blank=True)
-
-    class Meta:
-        ordering = ['date']
-        unique_together = ('book', 'user', 'page',)
-
-
-class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-    rating = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)])
-    review = models.TextField(max_length=150, null=True, blank=True)
-
-    class Meta:
-        ordering = ['date']
-        unique_together = ('book', 'user',)
-
-
-class ReadingProgress(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_started = models.DateField(default=Now)
-    date_finished = models.DateField(null=True, blank=True)
-    last_page_read = models.IntegerField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if self.last_page_read == self.book.page_count:
-            self.date_finished = Now
-        super().save(*args, **kwargs)
-
-    class Meta:
-        unique_together = ('book', 'user', 'last_page_read')
