@@ -11,7 +11,7 @@
         {{ form.as_p }}
         <button type="submit" class="btn btn-success">Submit</button>
         {% if review %}
-          <a href="{% url 'user:delete_review' object.pk review.pk %}" class="btn btn-danger">Delete</a>
+          <a href="{% url 'user:delete_review' object.book.pk review.pk %}" class="btn btn-danger">Delete</a>
         {% endif %}
       </form>
     </div>
