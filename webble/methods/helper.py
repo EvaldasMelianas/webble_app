@@ -1,6 +1,7 @@
+import base64
+
 import requests
 import fitz
-
 
 
 # Wiki API for images
@@ -35,6 +36,7 @@ def get_summary(query):
     return "Page not found"
 
 
+# noinspection PyUnresolvedReferences
 def get_pdf_data(pdf_path):
     return fitz.open(stream=pdf_path.read(), filetype="pdf")
 
@@ -43,3 +45,7 @@ def convert_pdf_to_image(pdf_data, page):
     pix = pdf_data.load_page(page).get_pixmap(alpha=False)
     image_data = pix.tobytes("jpg")
     return image_data
+
+
+def decode_image_data(image_data):
+    return base64.b64encode(image_data).decode('ascii')

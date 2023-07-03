@@ -1,5 +1,5 @@
-from .models import Genre, Review
+from .models import Genre
 
 
 def get_items(request):
-    return {'genres': Genre.objects.all(), 'reviews': Review.objects.all()}
+    return {'genres': Genre.objects.all()}

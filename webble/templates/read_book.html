@@ -1,32 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="container mt-4">
     <div class="row justify-content-center">
-      <div class="col-lg-8 mb-5">
+      <div class="col-lg-6 mb-3">
         <div class="card text-center">
           <div class="card-header">
-            <strong>
+            <small>
               <a href="{% url 'webble:book_detail' book.pk %}">
               {{ book.title }}
               </a>
-		      <p>Page: {{ page_number }} / {{ book.page_count }}</p>
-            </strong>
+		      Page: {{ page_number }} / {{ book.page_count }}
+            </small>
           </div>
           <div class="card-body" style="background-color:#EAF2F8;">
-              <img src="data:image/;base64,{{ page }}">
+              <img src="data:image/;base64,{{ page_image }}">
           </div>
           <div class="card-footer">
-            <form method="POST" action="{% url 'webble:read_book' book_pk=book.pk page_number=page_number %}">
-              {% csrf_token %}
-              {% if page_number > 1 %}
-              <button type="submit" name="previous">Previous</button>
-              {% endif %}
-              <button type="submit" name="bookmark">Bookmark</button>
-              {% if book.page_count > page_number %}
-              <button type="submit" name="next">Next</button>
-              {% endif %}
-            </form>
+              <form method="POST">
+                  {% csrf_token %}
+                  <div class="btn-group">
+                    {% if page_number > 1 %}
+                    <a href="{% url 'webble:read_book' book.title previous %}" class="btn btn-primary">Previous</a>
+                    {% endif %}
+                      <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" name="bookmark">Bookmark</button>
+                      </form>
+                    {% if book.page_count > page_number %}
+                    <a href="{% url 'webble:read_book' book.title next %}" class="btn btn-primary">Next</a>
+                    {% endif %}
+                  </div>
+              </form>
           </div>
         </div>
       </div>
     </div>
+</div>
 {% endblock %}
