@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
-from django.views.generic import FormView, DetailView, CreateView
+from django.views.generic import FormView, DetailView, CreateView, UpdateView, DeleteView
 
 from user.models import ReadingProgress, Bookmark, Review
 from webble.forms import RegistrationForm
@@ -53,10 +53,33 @@ class CreateReview(LoginRequiredMixin, CreateView):
     template_name = 'add_review.html'
 
     def get_success_url(self):
-        book_pk = self.kwargs['pk']
-        return reverse_lazy('webble:book_detail', kwargs={'pk': book_pk})
+        return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.book = Book.objects.get(pk=self.kwargs['pk'])
         return super().form_valid(form)
+
+
+class UpdateReview(LoginRequiredMixin, UpdateView):
+    model = Review
+    fields = ['rating', 'review']
+    template_name = 'add_review.html'
+
+    def get_success_url(self):
+        return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_object(self):
+        return Review.objects.get(pk=self.kwargs['review'])
+
+
+class DeleteReview(LoginRequiredMixin, DeleteView):
+    model = Review
+    fields = ['rating', 'review']
+    template_name = 'review_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_object(self):
+        return Review.objects.get(pk=self.kwargs['review'])

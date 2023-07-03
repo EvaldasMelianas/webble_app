@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>{{ title }}</h1>
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-  </form>
+<div class="container d-flex justify-content-center align-items-center" style="height: 80vh;">
+  <div class="card mt-4">
+    <div class="card-header">
+      Your review
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Submit</button>
+        {% if review %}
+          <a href="{% url 'user:delete_review' object.pk review.pk %}" class="btn btn-danger">Delete</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
