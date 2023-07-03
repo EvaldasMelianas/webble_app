@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView, CreateView
 
@@ -87,9 +87,9 @@ class SearchBookView(ListView):
     template_name = 'search_book.html'
     paginate_by = 9
 
-    def get_queryset(self):
-        query = self.request.GET.get('name_of_book')
-        return Book.objects.filter(title__icontains=query)
+    def post(self, request):
+        searched_books = Book.objects.filter(title__icontains=request.POST.get('name_of_book'))
+        return render(request, 'search_book.html', {'searched_books': searched_books})
 
 
 class ReadBookView(LoginRequiredMixin, DetailView):
