@@ -21,10 +21,13 @@ class RegisterView(FormView):
     def form_invalid(self, form):
         for name, error_list in form.errors.get_json_data().items():
             for error in error_list:
-                error_message = error['message']
-                messages.error(self.request, error_message)
+                messages.error(self.request, error['message'])
         return super().form_invalid(form)
 
+
+# User page view, displays bookmark and reading progress entries.
+# The user_bookmark contact is a dict constructor that creates a key, value pair for title and the pages bookmarked.
+# Context user_progress extracts all entries into the ReadingProgress model by the user.
 
 class UserDetails(DetailView):
     model = User
@@ -36,6 +39,7 @@ class UserDetails(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_progress'] = ReadingProgress.objects.filter(user=self.object)
+
         user_bookmarks = {}
         for bookmark in Bookmark.objects.filter(user=self.object):
             title = bookmark.book.title
@@ -43,8 +47,30 @@ class UserDetails(DetailView):
             if title not in user_bookmarks:
                 user_bookmarks[title] = []
             user_bookmarks[title].append(page_number)
+
         context['user_bookmarks'] = user_bookmarks
         return context
+
+    def post(self, request, **kwargs):
+        # If delete_bookmark buttons is pressed, the title and page is passed to the POST request.
+        # Since 2 items are passed, we split them to obtain the title and page separately.
+        # We get the Bookmark object that matches the user, title and page. Then we delete.
+        if 'delete_bookmark' in request.POST:
+            title, page = request.POST['delete_bookmark'].split('|')
+            bookmark = Bookmark.objects.get(
+                user=self.request.user,
+                book__title=title,
+                page=page)
+            bookmark.delete()
+
+        # If delete_progress is pressed, the primary key of the ReadingProgress entry is passed through POST.
+        # We filter by the request.user and primary key to obtain the specified entry. Then we delete.
+        if 'delete_progress' in request.POST:
+            progress = ReadingProgress.objects.get(
+                user=self.request.user,
+                pk=request.POST['delete_progress'])
+            progress.delete()
+        return self.get(request, **kwargs)
 
 
 class CreateReview(LoginRequiredMixin, CreateView):
@@ -52,9 +78,11 @@ class CreateReview(LoginRequiredMixin, CreateView):
     fields = ['rating', 'review']
     template_name = 'add_review.html'
 
+    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
+    # The book object is found by passing the 'pk' argument in the URL.
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.book = Book.objects.get(pk=self.kwargs['pk'])
@@ -66,11 +94,13 @@ class UpdateReview(LoginRequiredMixin, UpdateView):
     fields = ['rating', 'review']
     template_name = 'add_review.html'
 
+    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
+    # The specific review is found by checking for the primary key, that is passed through the URL part named 'review'.
     def get_object(self):
-        return Review.objects.get(pk=self.kwargs['review'])
+        return Review.objects.get(user=self.request.user, pk=self.kwargs['review'])
 
 
 class DeleteReview(LoginRequiredMixin, DeleteView):
@@ -78,8 +108,10 @@ class DeleteReview(LoginRequiredMixin, DeleteView):
     fields = ['rating', 'review']
     template_name = 'review_delete.html'
 
+    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
+    # The specific review is found by checking for the primary key, that is passed through the URL part named 'review'.
     def get_object(self):
-        return Review.objects.get(pk=self.kwargs['review'])
+        return Review.objects.get(user=self.request.user, pk=self.kwargs['review'])

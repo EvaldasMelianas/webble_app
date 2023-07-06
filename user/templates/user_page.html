@@ -27,9 +27,13 @@
               <div class="bookmark" data-book="{{ title }}">
                 <strong> {{ title }} </strong>
                 <small>Pages:</small>
-                {% for page in pages %}
-                <a href="{% url 'webble:read_book' title page %}"><strong>{{ page }}</strong></a>
-                {% endfor %}
+                <form method="post">
+                  {% for page in pages %}
+                  {% csrf_token %}
+                    <a href="{% url 'webble:read_book' title page %}"><strong>{{ page }}</strong></a>
+                    <button class="btn btn-danger btn-sm" type="submit" name="delete_bookmark" value="{{ title }}|{{ page }}"> x </button>
+                  {% endfor %}
+                </form>
                 <!-- Additional details about the bookmark -->
               </div>
               <hr>
@@ -56,9 +60,12 @@
                   <strong> Finished:</strong>
                   <small> {{ item.date_finished}} </small>
                 {% endif %}
-                <p>Current Page: {{ item.last_page_read }}
+                <form method="post">
+                  {% csrf_token %}
+                  <p>Current Page: {{ item.last_page_read }}
                   <a href="{% url 'webble:read_book' item.book.title item.last_page_read %}" class="btn btn-success btn-sm">Continue</a>
-                </p>
+                  <button class="btn btn-danger btn-sm" type="submit" name="delete_progress" value="{{ item.pk }}"> Delete </button>
+                </form>
                 <!-- Additional details about the progress -->
               </div>
               <hr>
