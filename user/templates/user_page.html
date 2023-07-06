@@ -5,25 +5,28 @@
     <div class="row">
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
-            <h3>Bookmarks</h3>
+          <div class="card-header text-center">
+            <h5>Bookmarks</h5>
           </div>
           <div class="card-body">
             <form method="POST" id="filterForm">
               {% csrf_token %}
               <label>Filter by Book Title:</label>
               <select name="name_of_book" id="bookTitleSelect">
-                <option value="">All</option>
                 {% for title in user_bookmarks %}
-                  <option value="{{ title }}">{{ title }}</option>
+                  {% if forloop.first %}
+                    <option value="{{ title }}" selected>{{ title }}</option>
+                  {% else %}
+                    <option value="{{ title }}">{{ title }}</option>
+                  {% endif %}
                 {% endfor %}
               </select>
               <button type="submit" class="btn btn-primary" name="filter_bookmark">Filter</button>
             </form>
             {% for title, pages in user_bookmarks.items %}
               <div class="bookmark" data-book="{{ title }}">
-                <h5> {{ title }} </h5>
-                <h5>Pages:</h5>
+                <strong> {{ title }} </strong>
+                <small>Pages:</small>
                 {% for page in pages %}
                 <a href="{% url 'webble:read_book' title page %}"><strong>{{ page }}</strong></a>
                 {% endfor %}
@@ -38,18 +41,23 @@
       </div>
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
-            <h3>Progress</h3>
+          <div class="card-header text-center">
+            <h5>Progress</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body text-center">
             {% for item in user_progress %}
               <div>
-                <h5>{{ item.book.title }}</h5>
+                <strong>{{ item.book.title }} </strong>
+                  <br>
+                  <strong> Started: </strong>
+                  <small> {{ item.date_started }} </small>
+                  <br>
+                {% if item.date_finished %}
+                  <strong> Finished:</strong>
+                  <small> {{ item.date_finished}} </small>
+                {% endif %}
                 <p>Current Page: {{ item.last_page_read }}
-                  <button>
-                  <a href="{% url 'webble:read_book' item.book.title item.last_page_read %}"
-                     class="btn btn-primary">Continue</a>
-                </button>
+                  <a href="{% url 'webble:read_book' item.book.title item.last_page_read %}" class="btn btn-success btn-sm">Continue</a>
                 </p>
                 <!-- Additional details about the progress -->
               </div>
@@ -66,6 +74,7 @@
     const filterForm = document.getElementById('filterForm');
     const bookTitleSelect = document.getElementById('bookTitleSelect');
     const bookmarks = document.querySelectorAll('.bookmark');
+    filterBookmarks(bookmarks[0].getAttribute('data-book'));
     filterForm.addEventListener('submit', function(event) {
       event.preventDefault();
       const selectedBook = bookTitleSelect.value;
@@ -79,6 +88,9 @@
         } else {
           bookmark.style.display = 'none';
         }
+        if (selectedBook === '' && index === 0) {
+        bookmark.style.display = 'block';
+      }
       });
     }
   </script>

@@ -1,0 +1,17 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="webble.models.Genre.objects" />
+          <option value="webble.models.Book.objects" />
+          <option value="webble.models.Bookmark.objects" />
+          <option value="webble.models.ReadingProgress.objects" />
+          <option value="webble.models.Review.objects" />
+          <option value="django.views.generic.base.View.get_context_data" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

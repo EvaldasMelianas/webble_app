@@ -17,8 +17,11 @@ class Author(models.Model):
             self.bio = get_summary(self.name)
             # Fetch the image data using helper function
             image_data = get_image_data(self.name)
-            # Save image as portrait
-            self.portrait.save(f'{self.name}.jpg', ContentFile(image_data), save=False)
+            if image_data is None:
+                self.portrait = 'author_portraits/not_found.jpg'
+            else:
+                # Save image as portrait
+                self.portrait.save(f'{self.name}.jpg', ContentFile(image_data), save=False)
         super().save(*args, **kwargs)
 
     def __str__(self):

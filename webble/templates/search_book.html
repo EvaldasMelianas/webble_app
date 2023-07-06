@@ -4,12 +4,6 @@
 
 {% block content %}
 
-<style>
-img {
-  border: 2px solid #B8C4CD;
-}
-</style>
-
 <div class="container mt-4">
   <div class="card text-center" style="background-color:#ECF0F1;">
     <h3> Search Results </h3>
@@ -26,6 +20,22 @@ img {
           <div class="card">
             <a href="{% url 'webble:book_detail' book.pk %}">
             <img src="{{ book.cover_image.url }}" class="card-img-top" style="object-fit: contain; height: 200px;">
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% for author in searched_authors %}
+        <div class="col-lg-2 mb-3">
+      <div class="card text-center">
+        <div class="card-header">
+          <small> Author: {{ author.name }} </small>
+        </div>
+        <div class="card-body" style="background-color:#EAF2F8;">
+          <div class="card">
+            <a href="{% url 'webble:author_detail' author.pk %}">
+            <img src="{{ author.portrait.url }}" class="card-img-top" style="object-fit: contain; height: 200px;">
             </a>
           </div>
         </div>
