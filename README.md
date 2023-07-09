@@ -3,7 +3,9 @@
 
 The project was developed as the final assignement for my 6 month CodeAcademy entry level Python course.
 
-I created this project using Django framework. I utilized PyMuPDF and Pillow libraries to develop an application that enables users to read books directly on a webpage. Additionally, the app includes features such as the ability to leave reviews, create bookmarks, and conveniently track reading progress, allowing users to easily resume from where they left off.
+I created this project using Django framework. I utilized PyMuPDF and Pillow libraries to develop an application that enables users to read books directly on the webpage. Additionally, the app includes features such as the ability to leave reviews, create bookmarks, and conveniently track reading progress, allowing users to easily resume from where they left off.
+
+There are two apps in the projects, "library" that deals with the books and "user", which contains the views and logic behind user progress, reviews and bookmarks.
 
 The model objects are created via the Django Administration page and a staff group was created to restrict access to only the Book, Genre and Author models.
 

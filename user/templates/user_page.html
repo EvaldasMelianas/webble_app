@@ -26,11 +26,12 @@
             {% for title, pages in user_bookmarks.items %}
               <div class="bookmark" data-book="{{ title }}">
                 <strong> {{ title }} </strong>
-                <small>Pages:</small>
                 <form method="post">
+                  <small>Pages:</small>
                   {% for page in pages %}
                   {% csrf_token %}
-                    <a href="{% url 'webble:read_book' title page %}"><strong>{{ page }}</strong></a>
+                    <strong>{{ page }}</strong>
+                    <a href="{% url 'webble:read_book' title page %}" class="btn btn-success btn-sm">></a>
                     <button class="btn btn-danger btn-sm" type="submit" name="delete_bookmark" value="{{ title }}|{{ page }}"> x </button>
                   {% endfor %}
                 </form>

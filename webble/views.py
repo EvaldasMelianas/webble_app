@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView, DetailView
 
@@ -10,7 +11,8 @@ from .methods.helper import get_pdf_data, decode_image_data, get_books_by_genre
 from user.methods.helper import get_review, update_reading_progress
 
 
-# Landing page view, displays 4 random genres and books associated with them.
+# Landing page view, displays 4 random genres and 6 books associated with them.
+# Logic behind the sorting of genres and books is within get_books_by_genre.
 class HomeView(ListView):
     model = Genre
     context_object_name = 'genres'
@@ -57,7 +59,8 @@ class GenreListView(ListView):
 # View to display details for the accessed book.
 # Context similar books builds list of books with matching genres.
 # Context reviews retrieves the reviews that are associated with the book object.
-# If statement checks if the user has already created a review, used for HTML to direct user to create or edit review.
+# Context rating retrieves the ratings from reviews and calculates an average.
+# If statement checks the user has already created a review, used for HTML to direct user to create or edit review.
 class BookDetailView(DetailView):
     model = Book
     template_name = 'book_detail.html'
@@ -65,10 +68,10 @@ class BookDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        reviews = Review.objects.filter(book__pk=self.object.pk)
         similar_books = Book.objects.filter(genres__in=self.object.genres.all()).exclude(pk=self.object.pk)
         context['similar_books'] = similar_books.order_by('?')[:5]
-        context['reviews'] = reviews
+        context['reviews'] = Review.objects.filter(book__pk=self.object.pk)
+        context['rating'] = context['reviews'].aggregate(Avg('rating'))['rating__avg']
         if self.request.user.is_authenticated:
             context['user_review'] = get_review(self.request.user, self.object.pk) or None
         return context

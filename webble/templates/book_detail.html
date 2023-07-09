@@ -16,6 +16,7 @@
           <h1 class="text-center">'{{ book.title }}'</h1>
           <h6 class="text-center">By: {{ book.authors.all|join:", " }}</h6>
           <h6 class="text-center">Published: {{ book.publish_date }}</h6>
+          <h6 class="text-center">Rating: {{ rating }}</h6>
         </div>
         <div class="card-body">
           <p class="card-text">{{ book.description }}</p>

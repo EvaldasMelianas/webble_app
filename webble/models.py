@@ -58,9 +58,5 @@ class Book(models.Model):
             self.cover_image.save(f'{self.title}.jpg', ContentFile(image_data), save=False)
         super().save(*args, **kwargs)
 
-    def average_rating(self):
-        # Get the average rating of the book, returns None if no reviews
-        return self.object.reviews.aggregate(Avg('rating'))['rating__avg']
-
     def __str__(self):
         return f'{self.title}'
