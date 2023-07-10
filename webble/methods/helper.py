@@ -61,7 +61,7 @@ def decode_image_data(pdf_path, page):
 
 def get_books_by_genre(genre_model, book_model):
     genre_books = {}
-    for genre in genre_model.objects.all().order_by('?')[:4]:
+    for genre in genre_model.objects.all().order_by('?')[:3]:
         filtered_books = book_model.objects.filter(genres=genre)
         genre_books[genre.genre] = filtered_books.order_by('?')[:6]
     return genre_books
