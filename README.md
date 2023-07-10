@@ -35,7 +35,7 @@ User page - contains the bookmarks and reader progress data, allows for quick ac
 
 ## Authors
 
-- [@Evaldas Melianas](https://github.com/psysheep)
+- [@Evaldas Melianas](https://www.linkedin.com/in/evaldas-melianas-9387a5261)
 
 
 ## Demo
