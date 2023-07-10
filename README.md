@@ -13,7 +13,7 @@ Book model - the cover image and summary are automatically populated. Cover imag
 
 Author model - the portrait and bio attributes are automatically populated. Both are scrapped via the Wikipedia API and saved within the database.
 
-## Usage
+## Webpage info
 
 Home page - displays suggestions of available books (up to 6) based on 3 random genres.
 
