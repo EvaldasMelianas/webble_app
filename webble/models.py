@@ -1,6 +1,5 @@
 from django.core.files.base import ContentFile
 from django.db import models
-from django.db.models import Avg
 
 from .methods.helper import get_image_data, get_summary, convert_pdf_to_image, get_pdf_data
 
@@ -10,6 +9,7 @@ class Author(models.Model):
     bio = models.TextField(null=True, blank=True)
     portrait = models.ImageField(upload_to='author_portraits/', blank=True, null=True,)
 
+    # Overwriting the save method.
     def save(self, *args, **kwargs):
         # Check if new entry is being created or updated
         if not self.pk:
@@ -45,6 +45,7 @@ class Book(models.Model):
     description = models.TextField(null=True, blank=True)
     page_count = models.IntegerField(null=True, blank=True)
 
+    # Overwriting the save method.
     def save(self, *args, **kwargs):
         # Check if new entry is being created or updated
         if not self.pk:

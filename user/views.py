@@ -62,6 +62,7 @@ class UserDetails(DetailView):
                 book__title=title,
                 page=page)
             bookmark.delete()
+            messages.success(self.request, 'Bookmark deleted successful')
 
         # If delete_progress is pressed, the primary key of the ReadingProgress entry is passed through POST.
         # We filter by the request.user and primary key to obtain the specified entry. Then we delete.
@@ -70,6 +71,7 @@ class UserDetails(DetailView):
                 user=self.request.user,
                 pk=request.POST['delete_progress'])
             progress.delete()
+            messages.success(self.request, 'Progress deleted successful')
         return self.get(request, **kwargs)
 
 
