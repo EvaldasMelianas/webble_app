@@ -44,6 +44,8 @@ There are several defined views in the code:
 git clone https://github.com/psysheep/webble_app.git
 ```
 2. Activate the virtual environment.
+
+   On MacOS:
 ```
 source venv/bin/activate
 ```
