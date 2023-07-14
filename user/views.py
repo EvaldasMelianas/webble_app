@@ -10,6 +10,9 @@ from webble.models import Book
 
 
 class RegisterView(FormView):
+    """
+    This view is responsible for obtaining and verifying the registration form.
+    """
     form_class = RegistrationForm
     template_name = 'register.html'
     success_url = '/'
@@ -25,11 +28,10 @@ class RegisterView(FormView):
         return super().form_invalid(form)
 
 
-# User page view, displays bookmark and reading progress entries.
-# The user_bookmark contact is a dict constructor that creates a key, value pair for title and the pages bookmarked.
-# Context user_progress extracts all entries into the ReadingProgress model by the user.
-
 class UserDetails(DetailView):
+    """
+    This view is responsible for obtaining user relevant information.
+    """
     model = User
     template_name = 'user_page.html'
     context_object_name = 'user'
@@ -37,6 +39,13 @@ class UserDetails(DetailView):
     slug_url_kwarg = 'username'
 
     def get_context_data(self, **kwargs):
+        """
+        Builds additional context with relevant user information.
+        user_bookmark dictionary is build to access the needed bookmark information more conveniently.
+
+        :param kwargs: retrieves context built by DetailView.
+        :return: Context dictionary.
+        """
         context = super().get_context_data(**kwargs)
         context['user_progress'] = ReadingProgress.objects.filter(user=self.object)
 
@@ -52,10 +61,18 @@ class UserDetails(DetailView):
         return context
 
     def post(self, request, **kwargs):
-        # If delete_bookmark buttons is pressed, the title and page is passed to the POST request.
-        # Since 2 items are passed, we split them to obtain the title and page separately.
-        # We get the Bookmark object that matches the user, title and page. Then we delete.
+        """
+        This method handles the POST request for deleting bookmarks and progress.
+
+        :param request: The HTTP POST request object.
+        :param kwargs: Additional keyword arguments.
+        :return: HTTP response.
+        """
         if 'delete_bookmark' in request.POST:
+            """
+            Since 2 items are passed, we split them to obtain the title and page separately.
+            We get the Bookmark object that matches the user, title and page. Then we delete.
+            """
             title, page = request.POST['delete_bookmark'].split('|')
             bookmark = Bookmark.objects.get(
                 user=self.request.user,
@@ -63,10 +80,10 @@ class UserDetails(DetailView):
                 page=page)
             bookmark.delete()
             messages.success(self.request, 'Bookmark deleted successfully')
-
-        # If delete_progress is pressed, the primary key of the ReadingProgress entry is passed through POST.
-        # We filter by the request.user and primary key to obtain the specified entry. Then we delete.
         if 'delete_progress' in request.POST:
+            """
+            We filter by the request.user and primary key to obtain the specified entry. Then we delete.
+            """
             progress = ReadingProgress.objects.get(
                 user=self.request.user,
                 pk=request.POST['delete_progress'])
@@ -80,11 +97,12 @@ class CreateReview(LoginRequiredMixin, CreateView):
     fields = ['rating', 'review']
     template_name = 'add_review.html'
 
-    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
+        """
+        On success, redirect to the book_detail page using the primary key of the book in the URL
+        """
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
-    # The book object is found by passing the 'pk' argument in the URL.
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.book = Book.objects.get(pk=self.kwargs['pk'])
@@ -96,12 +114,18 @@ class UpdateReview(LoginRequiredMixin, UpdateView):
     fields = ['rating', 'review']
     template_name = 'add_review.html'
 
-    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
+        """
+        On success redirects to book_detail page.
+        :return: The URL for the book_detail page with the primary key of the book in the URL.
+        """
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
-    # The specific review is found by checking for the primary key, that is passed through the URL part named 'review'.
-    def get_object(self):
+    def get_object(self, **kwargs):
+        """
+        Retrieves the submitted form for the review.pk and user pair.
+        :return: Review object.
+        """
         return Review.objects.get(user=self.request.user, pk=self.kwargs['review'])
 
 
@@ -110,10 +134,16 @@ class DeleteReview(LoginRequiredMixin, DeleteView):
     fields = ['rating', 'review']
     template_name = 'review_delete.html'
 
-    # On success redirect to book_detail page using the primary key of the book in the URL.
     def get_success_url(self):
+        """
+        On success redirects to book_detail page.
+        :return: The URL for the book_detail page with the primary key of the book in the URL.
+        """
         return reverse_lazy('webble:book_detail', kwargs={'pk': self.kwargs['pk']})
 
-    # The specific review is found by checking for the primary key, that is passed through the URL part named 'review'.
-    def get_object(self):
+    def get_object(self, **kwargs):
+        """
+        Retrieves the submitted form for the review.pk and user pair.
+        :return: Review object.
+        """
         return Review.objects.get(user=self.request.user, pk=self.kwargs['review'])

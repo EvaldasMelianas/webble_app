@@ -9,18 +9,21 @@ class Author(models.Model):
     bio = models.TextField(null=True, blank=True)
     portrait = models.ImageField(upload_to='author_portraits/', blank=True, null=True,)
 
-    # Overwriting the save method.
     def save(self, *args, **kwargs):
-        # Check if new entry is being created or updated
+        """
+        Overwriting the save method.
+
+        Check if new entry is being created not updated.
+        Set bio attribute to string fetched by get_summary function.
+        Attempt retrieving image data from Wiki API, if successful set it to portrait, otherwise use default.
+        Save the attributes and invoke the parent save method.
+        """
         if not self.pk:
-            # Fetch wiki summary using helper function
             self.bio = get_summary(self.name)
-            # Fetch the image data using helper function
             image_data = get_image_data(self.name)
             if image_data is None:
                 self.portrait = 'author_portraits/not_found.jpg'
             else:
-                # Save image as portrait
                 self.portrait.save(f'{self.name}.jpg', ContentFile(image_data), save=False)
         super().save(*args, **kwargs)
 
@@ -47,6 +50,15 @@ class Book(models.Model):
 
     # Overwriting the save method.
     def save(self, *args, **kwargs):
+        """
+        Overwriting the save method.
+
+        Check if new entry is being created not updated.
+        Set description attribute to string fetched by get_summary function.
+        Read the uploaded PDF book to access data and set page_count to the total pages.
+        Obtain pixel map from the books specified page to build cover image.
+        Save the attributes and invoke the parent save method.
+        """
         # Check if new entry is being created or updated
         if not self.pk:
             self.description = get_summary(self.title)
